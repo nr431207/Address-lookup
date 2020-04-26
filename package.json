@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "react-dev": "webpack -d --watch",
-    "start": "node server/index.js"
+    "start": "nodemon server/index.js",
+    "proxy": "http://localhost:4000"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "babel-preset-react": "^6.24.1",
     "css-loader": "^1.0.0",
     "jest": "^25.4.0",
+    "nodemon": "^2.0.3",
     "react-test-renderer": "^16.5.1",
     "style-loader": "^0.23.0",
     "webpack": "^4.17.2",
