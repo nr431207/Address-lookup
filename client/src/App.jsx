@@ -19,6 +19,7 @@ class App extends React.Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleContentChange = this.handleContentChange.bind(this);
     this.handleDate = this.handleDate.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   fetchData() {
@@ -33,6 +34,7 @@ class App extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    this.setState({ isAdding: !this.state.isAdding })
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -49,6 +51,7 @@ class App extends React.Component {
         this.setState({ errorMessage: error });
         console.error('There was an error!', error);
       });
+    this.fetchData();
   }
 
   handleAdd() {
@@ -63,6 +66,14 @@ class App extends React.Component {
   handleDate(e) {
     this.setState({ date: e.target.value })
   }
+  handleDelete(e) {
+    console.log('hi => ', e.target.value)
+    fetch(`http://localhost:${process.env.PORT || 4000}/diaries/${e.target.value}`, {
+      method: 'delete'
+    })
+      .then(response => console.log('this is response => ', response));
+    this.fetchData();
+  }
 
   render() {
     return (
@@ -74,19 +85,25 @@ class App extends React.Component {
               <div>
                 <h3>{diary.title}</h3>
                 <div>{truncateText(diary.content)}</div>
-                <button>Delete</button>
+                <button onClick={this.handleDelete} value={diary.id}>Delete</button>
               </div>
             </div>
         })}
         {this.state.isAdding ? <div>
           <form onSubmit={this.handleSubmit}>
-            <input placeholder="title" onChange={this.handleTitleChange}></input>
-            <input placeholder="how was today?" onChange={this.handleContentChange}></input>
-            <input type="date" onChange={this.handleDate}></input>
+            <div>
+              <input placeholder="title" onChange={this.handleTitleChange}></input>
+            </div>
+            <div>
+              <textarea placeholder="how was today?" onChange={this.handleContentChange}></textarea>
+            </div>
+            <div>
+              <input type="date" onChange={this.handleDate}></input>
+            </div>
             <button>Submit</button>
           </form>
         </div> : ''}
-        <button onClick={this.handleAdd}>Add a diary</button>
+        <div><button onClick={this.handleAdd}>Add a diary</button></div>
       </div>
     )
   }
