@@ -9,7 +9,7 @@ export default class Form extends React.Component {
   render() {
     const {
       handleContentChange,
-      handleDate,
+      handleDateChange,
       onSubmit,
       handleTitleChange,
       onClose
@@ -19,10 +19,22 @@ export default class Form extends React.Component {
       <div className={style.form}>
         <div className={style.heading}>Complete your diary</div>
         <form onSubmit={onSubmit}>
-          <label><span>Title <span className={style.required}>*</span></span><input type="text" className={style.input} onChange={handleTitleChange} /></label>
-          <label><span>Date <span className={style.required}>*</span></span><input type="date" className={style.input} onChange={handleDate} /></label>
-          <label><span>Content <span className={style.required}>*</span></span><textarea className={style.textarea} onChange={handleContentChange}></textarea></label>
-          <label><span> </span><input type="submit" value="Submit" /><button onClick={onClose}>Cancel</button></label>
+          <label>
+            <span>Title <span className={style.required}>*</span></span>
+            <input type="text" className={style.input} onChange={handleTitleChange} />
+          </label>
+          <label>
+            <span>Date <span className={style.required}>*</span></span>
+            <input type="date" className={style.input} onChange={handleDateChange} />
+          </label>
+          <label>
+            <span>Content <span className={style.required}>*</span></span>
+            <textarea className={style.textarea} onChange={handleContentChange}></textarea>
+          </label>
+          <label>
+            <span> </span><input className={style.margin} type="submit" value="Submit" />
+            <button onClick={onClose}>Cancel</button>
+          </label>
         </form>
       </div>)
   }

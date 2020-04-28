@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Dosis|Quicksand');
+
+html * {
+  font-family: Tisa;
+}
+
 .container {
   position: relative;
   display: inline-flex;
@@ -39,6 +45,7 @@ div:first-letter {
 
 .margin {
   margin-top: 24px;
+  margin-right: 18px;
 }
 
 .heading {

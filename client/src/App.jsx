@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from './Form';
 import Diary from './Diary';
-import { isInputValid } from '../utils/utils';
+import { isInputValid, createDate } from '../utils/utils';
 import cx from 'classnames';
 import * as style from './style.css';
 
@@ -15,7 +15,7 @@ class App extends React.Component {
       content: '',
       date: '',
       showFormModal: false,
-      isEditMode: false
+
     }
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onAddClick = this.onAddClick.bind(this);
@@ -23,8 +23,7 @@ class App extends React.Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleContentChange = this.handleContentChange.bind(this);
-    this.handleDate = this.handleDate.bind(this);
-    this.handleEdit = this.handleEdit.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
   }
 
@@ -43,12 +42,12 @@ class App extends React.Component {
     this.setState({ title: e.target.value })
   }
 
-  handleContentChange(e) {
-    this.setState({ content: e.target.value })
+  handleDateChange(e) {
+    this.setState({ date: e.target.value })
   }
 
-  handleDate(e) {
-    this.setState({ date: e.target.value })
+  handleContentChange(e) {
+    this.setState({ content: e.target.value })
   }
 
   onAddClick() {
@@ -63,42 +62,37 @@ class App extends React.Component {
     this.fetchData();
   }
 
-  handleEdit(e) {
-    this.setState({ isEditMode: !this.state.isEditMode })
-  }
-
   handleEditSubmit(e) {
     e.preventDefault();
+    console.log('hiiiiiii')
     const { date, title, content, isEditMode } = this.state;
-    console.log(title, content, date)
-    if (!isInputValid(date, title, content)) {
-      alert('one or more of fields is empty, please complete all fields')
-    } else {
-      this.setState({ isEditMode: !isEditMode })
-      const requestOptions = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title,
-          content: content,
-          date: date
-        })
-      };
-      fetch(`http://localhost:${process.env.PORT || 4000}/put/${e.target.value}`, requestOptions)
-        .then(response => response.json())
-        .then((body) => console.log(body))
-        .catch(error => {
-          console.log('error: ', error)
-        });
-      this.fetchData();
-    }
+    console.log('title: ', title, 'content: ', content)
 
+    this.setState({ isEditMode: !isEditMode })
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: title,
+        content: content,
+        date: date
+      })
+    };
+    fetch(`http://localhost:${process.env.PORT || 4000}/put/${e.target.value}`, requestOptions)
+      .then(response => response.json())
+      .then((body) => console.log(body))
+      .catch(error => {
+        console.log('error: ', error)
+      });
+    this.fetchData();
   }
 
   handleSubmit(e) {
-    const { date, title, content, showFormModal } = this.state;
     e.preventDefault();
-    if (!isInputValid(date, title, content)) {
+    const { title, content, showFormModal } = this.state;
+    let today = createDate()
+    console.log(today)
+    if (!isInputValid(title, content)) {
       alert('one or more of fields is empty, please complete all fields')
     } else {
       this.setState({ showFormModal: !showFormModal })
@@ -108,7 +102,7 @@ class App extends React.Component {
         body: JSON.stringify({
           title: title,
           content: content,
-          date: date
+          date: today
         })
       };
       fetch(`http://localhost:${process.env.PORT || 4000}/post`, requestOptions)
@@ -123,9 +117,8 @@ class App extends React.Component {
 
   render() {
     const {
-      data,
       showFormModal,
-      isEditMode
+      data
     } = this.state
     return (
       showFormModal ? <div>
@@ -134,7 +127,7 @@ class App extends React.Component {
           onSubmit={this.handleSubmit}
           handleTitleChange={this.handleTitleChange}
           handleContentChange={this.handleContentChange}
-          handleDate={this.handleDate}
+          handleDateChange={this.handleDateChange}
         />
       </div> :
         <div>
@@ -145,11 +138,7 @@ class App extends React.Component {
                 key={index}
                 diary={diary}
                 handleDelete={this.handleDelete}
-                handleEdit={this.handleEdit}
                 handleEditSubmit={this.handleEditSubmit}
-                isEditMode={isEditMode}
-                handleTitleChange={this.handleTitleChange}
-                handleContentChange={this.handleContentChange}
               />
             )
           })}

@@ -27,25 +27,23 @@ app.get('/diaries', (req, res) => {
 
 app.post('/post', (req, res) => {
  let diary = req.body;
- connection.query(`insert into \`diary-content\`(title, content, \`creation-date\`) values (\'${diary.title.toString()}\', \'${diary.content.toString()}\', \'${diary.date.toString()}\');`, 
+ connection.query(`insert into \`diary-content\`(title, content, creationDate) values (\'${diary.title.toString()}\', \'${diary.content.toString()}\', \'${diary.date.toString()}\');`, 
  (err, result) => {
   if(err) throw err;
   res.end(JSON.stringify(result));
  });
 })
 
-app.put('/put/:id', function (req, res) {
+app.put('/put/:id', (req, res) => {
   let diary = req.body;
   let id = req.params.id
-  console.log(diary, id)
-  connection.query('UPDATE `diary-content` SET title=?,content=? where id=?', [diary.title, diary.content, id], function (error, results, fields) {
+  connection.query('UPDATE `diary-content` SET title=?,content=? WHERE `id`=?', [diary.title, diary.content, id], function (error, results, fields) {
    if (error) throw error;
    res.end(JSON.stringify(results));
  });
 });
 
-//rest api to delete record from mysql database
-app.delete('/diaries/:id', function (req, res) {
+app.delete('/diaries/:id', (req, res) => {
   let id = req.params.id;
   connection.query('DELETE FROM `diary-content` WHERE `id`=?', [id], (error, result) => {
    if (error) throw error;
