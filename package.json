@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/nr431207/Address-lookup#readme",
   "dependencies": {
+    "classnames": "^2.2.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "fetch": "^1.1.0",

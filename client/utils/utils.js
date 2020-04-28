@@ -6,3 +6,8 @@ export const truncateText = text => {
   }
   return text
 }
+
+export const isInputValid = (title, content, date) => {
+  if(title === '' || content === '' || date === '') return false
+    return true
+}

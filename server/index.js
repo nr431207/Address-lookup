@@ -34,12 +34,15 @@ app.post('/post', (req, res) => {
  });
 })
 
-// app.put('/employees', function (req, res) {
-//   connection.query('UPDATE `employee` SET `employee_name`=?,`employee_salary`=?,`employee_age`=? where `id`=?', [req.body.employee_name,req.body.employee_salary, req.body.employee_age, req.body.id], function (error, results, fields) {
-//    if (error) throw error;
-//    res.end(JSON.stringify(results));
-//  });
-// });
+app.put('/put/:id', function (req, res) {
+  let diary = req.body;
+  let id = req.params.id
+  console.log(diary, id)
+  connection.query('UPDATE `diary-content` SET title=?,content=? where id=?', [diary.title, diary.content, id], function (error, results, fields) {
+   if (error) throw error;
+   res.end(JSON.stringify(results));
+ });
+});
 
 //rest api to delete record from mysql database
 app.delete('/diaries/:id', function (req, res) {
