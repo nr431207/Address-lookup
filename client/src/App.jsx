@@ -24,7 +24,6 @@ class App extends React.Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleContentChange = this.handleContentChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleEditSubmit = this.handleEditSubmit.bind(this);
   }
 
   fetchData() {
@@ -59,31 +58,6 @@ class App extends React.Component {
       method: 'delete'
     })
       .then(response => console.log('this is response => ', response));
-    this.fetchData();
-  }
-
-  handleEditSubmit(e) {
-    e.preventDefault();
-    console.log('hiiiiiii')
-    const { date, title, content, isEditMode } = this.state;
-    console.log('title: ', title, 'content: ', content)
-
-    this.setState({ isEditMode: !isEditMode })
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: title,
-        content: content,
-        date: date
-      })
-    };
-    fetch(`http://localhost:${process.env.PORT || 4000}/put/${e.target.value}`, requestOptions)
-      .then(response => response.json())
-      .then((body) => console.log(body))
-      .catch(error => {
-        console.log('error: ', error)
-      });
     this.fetchData();
   }
 
@@ -138,7 +112,6 @@ class App extends React.Component {
                 key={index}
                 diary={diary}
                 handleDelete={this.handleDelete}
-                handleEditSubmit={this.handleEditSubmit}
               />
             )
           })}
