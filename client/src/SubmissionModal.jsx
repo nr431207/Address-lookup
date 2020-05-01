@@ -5,15 +5,14 @@ import Button from 'react-bootstrap/Button';
 import * as style from '../src/style.css';
 const SubmissionModal = ({ handleDelete, diary, isIncomplete, handleShowSubmissionModal, newDiary }) => {
   const [show, setShow] = useState(true);
-
   const handleClose = () => setShow(false);
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal style={{ opacity: 1 }} show={show} onHide={handleClose}>
       <Modal.Header>
         <Modal.Title>{isIncomplete ? 'Form Incomplete' : 'Confirm Delete'}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{getModalBodyMessage(isIncomplete, isTitleLong, isContentLong, JSON.parse(newDiary))}</Modal.Body>
+      <Modal.Body>{getModalBodyMessage(isIncomplete, isTitleLong, isContentLong, newDiary)}</Modal.Body>
       <Modal.Footer>
         {isIncomplete ?
           <Button variant="primary" onClick={handleShowSubmissionModal}>

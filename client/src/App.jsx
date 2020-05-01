@@ -17,6 +17,7 @@ class App extends React.Component {
     super();
     this.state = {
       data: [],
+      diaryCount: 0,
       showAlert: false,
       isIncomplete: false,
       newDiary: {}
@@ -33,8 +34,15 @@ class App extends React.Component {
     fetch(`http://localhost:${process.env.PORT || 4000}/diaries`)
       .then(res => res.json())
       .then(data => {
-        data.forEach(item => item.showFormModal = false);
-        this.setState({ data })
+        let count = 0;
+        data.forEach(item => {
+          count++
+          item.showFormModal = false
+        });
+        this.setState({
+          data,
+          diaryCount: count
+        })
       })
       .catch(err => console.log(err))
   }
@@ -133,10 +141,10 @@ class App extends React.Component {
   }
 
   render() {
-    const { data, showSubmissionModal, isIncomplete, newDiary } = this.state;
+    const { data, showSubmissionModal, isIncomplete, newDiary, diaryCount } = this.state;
     return (
       <div class="container-sm">
-        <div className={style.heading}>My Diary Book</div>{`Total diaries: ${data.length}`}
+        <div className={style.heading}>My Diary Book</div>{`Total diaries: ${diaryCount}`}
         <div><Button variant="primary" onClick={this.onAddClick}>Add a new diary</Button></div>
         {data.map((diary, index) => {
           return (
@@ -150,7 +158,6 @@ class App extends React.Component {
                 />
                 :
                 <Diary
-
                   diary={diary}
                   showSubmissionModal={showSubmissionModal}
                   handleDelete={this.handleDelete}
