@@ -1,27 +1,49 @@
 import React, { useState } from 'react';
-import { truncateText, createDate } from '../utils/utils';
+import {
+  truncateText,
+  getDate,
+  isTextShort
+} from '../utils/utils';
+import Button from 'react-bootstrap/Button';
 import * as style from './style.css';
-import cx from 'classnames';
 
-const Diary = (props) => {
-  const [isDiaryOpen, toggleDiary] = useState(false);
-  const { title, content, id, creationDate } = props.diary;
+const Diary = ({ diary, handleEdit, handleShowSubmissionModal }) => {
+  const [isExpanded, toggleExpand] = useState(false);
+  const { title, content, id } = diary;
 
   return (
-    <div onClick={() => { toggleDiary(!isDiaryOpen) }} className={cx(style.container, style.grow)}>
-      <div className={style.box}>
-        <div>
+    <div onClick={() => { toggleExpand(!isExpanded) }} class="card mt-4">
+      <div class="card-body">
+
+        <span className={style.date}><h3 class="card-title">{title}</h3>
+          <div>{getDate()}</div></span>
+
+        {isTextShort(content) ?
           <div>
-            <h3>{title}</h3>
-            <div>{creationDate}</div>
+            <p class="card-text">{content}</p>
           </div>
-          <div>{isDiaryOpen ? content : truncateText(content)}</div>
-        </div>
-        <span> <button onClick={props.handleDelete} value={id} className={style.margin}>Delete</button>
+          :
+          isExpanded ?
+            <div>
+              <p class="card-text">{content}</p>
+              <Button variant="secondary" onClick={() => { toggleExpand(isExpanded) }}>Read Less</Button>
+            </div>
+            :
+            <div>
+              <p class="card-text">{truncateText(content)}</p>
+              <Button variant="secondary" onClick={() => { toggleExpand(isExpanded) }}>Read More</Button>
+            </div>}
+
+        <span>
+          <Button variant="danger" onClick={handleShowSubmissionModal} className={style.margin}>Delete</Button>
+          <Button variant="primary" onClick={handleEdit} value={id} className={style.margin}>Edit</Button>
+
         </span>
       </div>
+
     </div>
 
   )
+
 }
 export default Diary;

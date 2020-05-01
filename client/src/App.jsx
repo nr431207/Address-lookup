@@ -1,8 +1,14 @@
 import React from 'react';
-import Form from './Form';
 import Diary from './Diary';
-import { isInputValid, createDate } from '../utils/utils';
-import cx from 'classnames';
+import Form from './Form';
+import {
+  isInputValid,
+  submitDate,
+  isTitleLong,
+  isContentLong
+} from '../utils/utils';
+import SubmissionModal from './SubmissionModal';
+import Button from 'react-bootstrap/Button';
 import * as style from './style.css';
 
 
@@ -11,112 +17,158 @@ class App extends React.Component {
     super();
     this.state = {
       data: [],
-      title: '',
-      content: '',
-      date: '',
-      showFormModal: false,
-
+      showAlert: false,
+      isIncomplete: false,
+      newDiary: {}
     }
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onAddClick = this.onAddClick.bind(this);
     this.fetchData = this.fetchData.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.handleTitleChange = this.handleTitleChange.bind(this);
-    this.handleContentChange = this.handleContentChange.bind(this);
-    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleShowSubmissionModal = this.handleShowSubmissionModal.bind(this);
   }
 
   fetchData() {
     fetch(`http://localhost:${process.env.PORT || 4000}/diaries`)
       .then(res => res.json())
-      .then(data => this.setState({ data }))
+      .then(data => {
+        data.forEach(item => item.showFormModal = false);
+        this.setState({ data })
+      })
       .catch(err => console.log(err))
   }
-
   componentDidMount() {
     this.fetchData()
   }
 
-  handleTitleChange(e) {
-    this.setState({ title: e.target.value })
-  }
-
-  handleDateChange(e) {
-    this.setState({ date: e.target.value })
-  }
-
-  handleContentChange(e) {
-    this.setState({ content: e.target.value })
+  onShowAlert() {
+    this.setState({ showAlert: !this.state.showAlert })
   }
 
   onAddClick() {
-    this.setState({ showFormModal: !this.state.showFormModal })
+    const data = this.state.data
+    data.unshift({
+      showFormModal: true,
+      title: '',
+      content: '',
+      creationDate: ''
+    })
+    this.setState({ data })
+  }
+
+  handleCancel() {
+    this.fetchData();
+  }
+
+  handleEdit(itemId) {
+    const data = this.state.data.map(item => {
+      if (item.id === itemId) {
+        item.showFormModal = true;
+      }
+      return item
+    })
+    this.setState({ data })
   }
 
   handleDelete(e) {
     fetch(`http://localhost:${process.env.PORT || 4000}/diaries/${e.target.value}`, {
-      method: 'delete'
+      method: 'delete',
+      headers: {
+        'content-type': 'application/json'
+      }
     })
-      .then(response => console.log('this is response => ', response));
+      .then(response => response);
     this.fetchData();
+    this.handleShowSubmissionModal();
+
+  }
+
+  handleShowSubmissionModal() {
+    this.setState({ showSubmissionModal: !this.state.showSubmissionModal })
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    const { title, content, showFormModal } = this.state;
-    let today = createDate()
-    console.log(today)
-    if (!isInputValid(title, content)) {
-      alert('one or more of fields is empty, please complete all fields')
+    const data = new FormData(e.target);
+    const body = JSON.stringify({
+      title: data.get('title'),
+      content: data.get('content'),
+      creationDate: submitDate()
+    })
+    if (!isInputValid(body) || isTitleLong(JSON.parse(body)) || isContentLong(JSON.parse(body))) {
+      this.setState({
+        isIncomplete: true,
+        newDiary: body
+      })
+      this.handleShowSubmissionModal()
     } else {
-      this.setState({ showFormModal: !showFormModal })
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title,
-          content: content,
-          date: today
+      this.setState({ isIncomplete: false })
+      const headers = { 'Content-Type': 'application/json' }
+      if (data.get('id')) {
+        fetch(`http://localhost:${process.env.PORT || 4000}/put/${data.get('id')}`, {
+          method: 'PUT',
+          headers,
+          body
         })
-      };
-      fetch(`http://localhost:${process.env.PORT || 4000}/post`, requestOptions)
-        .then(response => response.json())
-        .then((body) => console.log(body))
-        .catch(error => {
-          console.log('error: ', error)
-        });
+          .then(response => response.json())
+          .then((body) => console.log(body))
+          .catch(error => {
+            console.log('error: ', error)
+          });
+      } else {
+        fetch(`http://localhost:${process.env.PORT || 4000}/post`, {
+          method: 'post',
+          headers,
+          body
+        })
+          .then(response => response.json())
+          .then((body) => console.log(body))
+          .catch(error => {
+            console.log('error: ', error)
+          });
+      }
       this.fetchData();
     }
   }
 
   render() {
-    const {
-      showFormModal,
-      data
-    } = this.state
+    const { data, showSubmissionModal, isIncomplete, newDiary } = this.state;
     return (
-      showFormModal ? <div>
-        <Form
-          onClose={this.onAddClick}
-          onSubmit={this.handleSubmit}
-          handleTitleChange={this.handleTitleChange}
-          handleContentChange={this.handleContentChange}
-          handleDateChange={this.handleDateChange}
-        />
-      </div> :
-        <div>
-          <div className={style.heading}>Welcome to your diary</div>
-          {data.map((diary, index) => {
-            return (
-              <Diary
-                key={index}
-                diary={diary}
-                handleDelete={this.handleDelete}
-              />
-            )
-          })}
-          <div><button onClick={this.onAddClick}>Add a diary</button></div>
-        </div>
+      <div class="container-sm">
+        <div className={style.heading}>My Diary Book</div>{`Total diaries: ${data.length}`}
+        <div><Button variant="primary" onClick={this.onAddClick}>Add a new diary</Button></div>
+        {data.map((diary, index) => {
+          return (
+            <div key={index}>
+              {diary.showFormModal ?
+                <Form
+
+                  handleSubmit={this.handleSubmit}
+                  handleCancel={this.handleCancel}
+                  diary={diary}
+                />
+                :
+                <Diary
+
+                  diary={diary}
+                  showSubmissionModal={showSubmissionModal}
+                  handleDelete={this.handleDelete}
+                  handleEdit={this.handleEdit.bind(this, diary.id)}
+                  handleShowSubmissionModal={this.handleShowSubmissionModal}
+                />}
+              {showSubmissionModal &&
+                <SubmissionModal
+                  handleShowSubmissionModal={this.handleShowSubmissionModal}
+                  handleDelete={this.handleDelete}
+                  diary={diary}
+                  isIncomplete={isIncomplete}
+                  newDiary={newDiary}
+                />}
+            </div>
+          )
+        })}
+      </div>
     )
   }
 

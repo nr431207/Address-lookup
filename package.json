@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/nr431207/Address-lookup#readme",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -29,9 +30,12 @@
     "leaflet": "^1.6.0",
     "mysql": "^2.18.1",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
     "react-dev": "0.0.1",
     "react-dom": "^16.13.1",
     "react-leaflet": "^2.6.3",
+    "react-redux": "^7.2.0",
+    "redux": "^4.0.5",
     "styled-components": "^5.1.0",
     "webpack-cli": "^3.1.0",
     "yarn": "^1.9.4"
@@ -53,6 +57,7 @@
     "nodemon": "^2.0.3",
     "react-test-renderer": "^16.5.1",
     "style-loader": "^0.23.0",
+    "url-loader": "^4.1.0",
     "webpack": "^4.17.2",
     "webpack-dev-server": "^3.1.8"
   },

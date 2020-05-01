@@ -7,7 +7,6 @@ const port = process.env.port || 4000
 const corsOptions = {origin:`http://localhost:${port}`};
 app.use(cors(corsOptions));
 app.use(bodyParser.json())
-path = require('path');
 
 app.use(express.static(`${__dirname}/../client/dist`));
 
@@ -17,7 +16,10 @@ const connection = mysql.createConnection({
   password: 'password',
   database: 'diary'
 });
-connection.connect();
+connection.connect((err) => {
+  if(err) console.log(err)
+    console.log('DB  connected!')
+});
 app.get('/diaries', (req, res) => {
     connection.query('select * from `diary-content`', (error, results) => {
       if (error) throw error;
@@ -26,8 +28,8 @@ app.get('/diaries', (req, res) => {
 });
 
 app.post('/post', (req, res) => {
- let diary = req.body;
- connection.query(`insert into \`diary-content\`(title, content, creationDate) values (\'${diary.title.toString()}\', \'${diary.content.toString()}\', \'${diary.date.toString()}\');`, 
+ const {title, content, creationDate} = req.body
+ connection.query('insert into `diary-content`(title, content, creationDate) values(?, ?, ?)',[title, content, creationDate], 
  (err, result) => {
   if(err) throw err;
   res.end(JSON.stringify(result));
@@ -45,6 +47,7 @@ app.put('/put/:id', (req, res) => {
 
 app.delete('/diaries/:id', (req, res) => {
   let id = req.params.id;
+  console.log(id)
   connection.query('DELETE FROM `diary-content` WHERE `id`=?', [id], (error, result) => {
    if (error) throw error;
    res.end('Record has been deleted!');

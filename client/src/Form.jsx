@@ -1,41 +1,29 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 import * as style from './style.css';
 
-export default class Form extends React.Component {
-  constructor(props) {
-    super(props);
-
-  }
-  render() {
-    const {
-      handleContentChange,
-      handleDateChange,
-      onSubmit,
-      handleTitleChange,
-      onClose
-    } = this.props
-
-    return (
-      <div className={style.form}>
-        <div className={style.heading}>Complete your diary</div>
-        <form onSubmit={onSubmit}>
-          <label>
-            <span>Title <span className={style.required}>*</span></span>
-            <input type="text" className={style.input} onChange={handleTitleChange} />
-          </label>
-          <label>
-            <span>Date <span className={style.required}>*</span></span>
-            <input type="date" className={style.input} onChange={handleDateChange} />
-          </label>
-          <label>
-            <span>Content <span className={style.required}>*</span></span>
-            <textarea className={style.textarea} onChange={handleContentChange}></textarea>
-          </label>
-          <label>
-            <span> </span><input className={style.margin} type="submit" value="Submit" />
-            <button onClick={onClose}>Cancel</button>
-          </label>
+const Form = ({ handleSubmit, handleCancel, diary }) => {
+  const { id, title, content } = diary
+  return (
+    <div class="container">
+      <div class="card-body">
+        <form onSubmit={handleSubmit}>
+          <input type="hidden" name="id" value={diary.id} />
+          <div class="input-group input-group-sm mb-3">
+            <input type="text" name="title" placeholder="Title" defaultValue={title} />
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <textarea name="content" class="form-control" placeholder="Content" defaultValue={content}></textarea>
+          </div>
+          <span>
+            <Button variant="primary" className={style.margin} type="button" onClick={handleCancel}>Cancel</Button>
+            <Button variant="primary" className={style.margin} type="submit">Save</Button>
+          </span>
         </form>
-      </div>)
-  }
+      </div>
+    </div>
+  )
+
 }
+
+export default Form;
