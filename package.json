@@ -1,5 +1,5 @@
 {
-  "name": "address-lookup",
+  "name": "diary-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.jsx",
@@ -9,20 +9,33 @@
     "start": "nodemon server/index.js",
     "proxy": "http://localhost:4000"
   },
+  "jest": {
+    "verbose": true,
+    "setupFiles": [
+      "./jestsetup.js"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "moduleNameMapper": {
+      "^.+\\.(css|scss)$": "identity-obj-proxy"
+    }
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nr431207/Address-lookup.git"
+    "url": "git+https://github.com/nr431207/Diary-App.git"
   },
   "author": "Sonia Rohani",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nr431207/Address-lookup/issues"
+    "url": "https://github.com/nr431207/Diary-App/issues"
   },
-  "homepage": "https://github.com/nr431207/Address-lookup#readme",
+  "homepage": "https://github.com/nr431207/Diary-App#readme",
   "dependencies": {
     "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fetch": "^1.1.0",
     "file-loader": "^2.0.0",
@@ -31,6 +44,7 @@
     "mysql": "^2.18.1",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
+    "react-dates": "^21.8.0",
     "react-dev": "0.0.1",
     "react-dom": "^16.13.1",
     "react-leaflet": "^2.6.3",
@@ -42,8 +56,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.0.0",
+    "@babel/runtime": "^7.9.6",
     "babel-cli": "^6.26.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
@@ -65,8 +81,22 @@
   },
   "babel": {
     "presets": [
-      "@babel/preset-env",
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "browsers": [
+              ">0.25%",
+              "not ie 11",
+              "not op_mini all"
+            ]
+          }
+        }
+      ],
       "@babel/preset-react"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
     ]
   }
 }

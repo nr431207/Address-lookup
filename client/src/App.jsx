@@ -3,20 +3,21 @@ import Diary from './Diary';
 import Form from './Form';
 import {
   isInputValid,
-  submitDate,
   isTitleLong,
+  submitDate,
   isContentLong
 } from '../utils/utils';
 import SubmissionModal from './SubmissionModal';
 import Button from 'react-bootstrap/Button';
 import * as style from './style.css';
 
-
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
       data: [],
+      idToBeDeleted: null,
+      isDeleting: false,
       diaryCount: 0,
       showAlert: false,
       isIncomplete: false,
@@ -27,42 +28,45 @@ class App extends React.Component {
     this.fetchData = this.fetchData.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
-    this.handleShowSubmissionModal = this.handleShowSubmissionModal.bind(this);
+    this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
-  fetchData() {
-    fetch(`http://localhost:${process.env.PORT || 4000}/diaries`)
-      .then(res => res.json())
-      .then(data => {
-        let count = 0;
-        data.forEach(item => {
-          count++
-          item.showFormModal = false
-        });
-        this.setState({
-          data,
-          diaryCount: count
-        })
+  async fetchData() {
+    try {
+      const response = await fetch(`http://localhost:${process.env.PORT || 4000}/diaries`);
+      const data = await response.json();
+      let count = 0;
+      data.forEach(item => {
+        count++
+        item.showFormModal = false
+      });
+      this.setState({
+        data,
+        diaryCount: count
       })
-      .catch(err => console.log(err))
+    } catch (err) {
+      console.log(err);
+    }
   }
+
   componentDidMount() {
-    this.fetchData()
+    this.fetchData();
   }
 
   onShowAlert() {
-    this.setState({ showAlert: !this.state.showAlert })
+    this.setState({ showAlert: !this.state.showAlert });
   }
 
   onAddClick() {
-    const data = this.state.data
+    const data = this.state.data;
     data.unshift({
       showFormModal: true,
       title: '',
       content: '',
       creationDate: ''
     })
-    this.setState({ data })
+    this.setState({ data });
   }
 
   handleCancel() {
@@ -74,13 +78,14 @@ class App extends React.Component {
       if (item.id === itemId) {
         item.showFormModal = true;
       }
-      return item
+      return item;
     })
     this.setState({ data })
   }
 
-  handleDelete(e) {
-    fetch(`http://localhost:${process.env.PORT || 4000}/diaries/${e.target.value}`, {
+  handleDelete(id) {
+    let itemId = id.currentTarget.getAttribute('value');
+    fetch(`http://localhost:${process.env.PORT || 4000}/diaries/${itemId}`, {
       method: 'delete',
       headers: {
         'content-type': 'application/json'
@@ -88,12 +93,18 @@ class App extends React.Component {
     })
       .then(response => response);
     this.fetchData();
-    this.handleShowSubmissionModal();
-
+    this.toggleModal();
   }
 
-  handleShowSubmissionModal() {
-    this.setState({ showSubmissionModal: !this.state.showSubmissionModal })
+  toggleModal() {
+    this.setState({ showSubmissionModal: !this.state.showSubmissionModal });
+  }
+
+  toggleDeleteModal(id) {
+    this.setState({
+      showSubmissionModal: !this.state.showSubmissionModal,
+      idToBeDeleted: id.currentTarget.getAttribute('value')
+    })
   }
 
   handleSubmit(e) {
@@ -109,7 +120,7 @@ class App extends React.Component {
         isIncomplete: true,
         newDiary: body
       })
-      this.handleShowSubmissionModal()
+      this.toggleModal();
     } else {
       this.setState({ isIncomplete: false })
       const headers = { 'Content-Type': 'application/json' }
@@ -120,10 +131,8 @@ class App extends React.Component {
           body
         })
           .then(response => response.json())
-          .then((body) => console.log(body))
-          .catch(error => {
-            console.log('error: ', error)
-          });
+          .then(body => body)
+          .catch(error => error);
       } else {
         fetch(`http://localhost:${process.env.PORT || 4000}/post`, {
           method: 'post',
@@ -131,10 +140,10 @@ class App extends React.Component {
           body
         })
           .then(response => response.json())
-          .then((body) => console.log(body))
+          .then(body => body)
           .catch(error => {
-            console.log('error: ', error)
-          });
+            console.log(error)
+          })
       }
       this.fetchData();
     }
@@ -143,7 +152,7 @@ class App extends React.Component {
   render() {
     const { data, showSubmissionModal, isIncomplete, newDiary, diaryCount } = this.state;
     return (
-      <div class="container-sm">
+      <div className="container-sm">
         <div className={style.heading}>My Diary Book</div>{`Total diaries: ${diaryCount}`}
         <div><Button variant="primary" onClick={this.onAddClick}>Add a new diary</Button></div>
         {data.map((diary, index) => {
@@ -151,7 +160,6 @@ class App extends React.Component {
             <div key={index}>
               {diary.showFormModal ?
                 <Form
-
                   handleSubmit={this.handleSubmit}
                   handleCancel={this.handleCancel}
                   diary={diary}
@@ -160,24 +168,22 @@ class App extends React.Component {
                 <Diary
                   diary={diary}
                   showSubmissionModal={showSubmissionModal}
-                  handleDelete={this.handleDelete}
                   handleEdit={this.handleEdit.bind(this, diary.id)}
-                  handleShowSubmissionModal={this.handleShowSubmissionModal}
-                />}
-              {showSubmissionModal &&
-                <SubmissionModal
-                  handleShowSubmissionModal={this.handleShowSubmissionModal}
-                  handleDelete={this.handleDelete}
-                  diary={diary}
-                  isIncomplete={isIncomplete}
-                  newDiary={newDiary}
+                  toggleDeleteModal={this.toggleDeleteModal}
                 />}
             </div>
           )
         })}
+        {showSubmissionModal &&
+          <SubmissionModal
+            toggleModal={this.toggleModal}
+            handleDelete={this.handleDelete}
+            id={this.state.idToBeDeleted}
+            isIncomplete={isIncomplete}
+            newDiary={newDiary}
+          />}
       </div>
     )
   }
-
 }
 export default App;
