@@ -1,5 +1,5 @@
 # Address-lookup
-This is a full stack CRUD web application for saving personal diaries/logs. Users can perfom the following using this application: 
+This is a full stack CRUD web application for saving personal diaries/logs. Users can perform the following using this application: 
 -   Add a new content     
 -   Delete a current content
 -   Edit a current content
