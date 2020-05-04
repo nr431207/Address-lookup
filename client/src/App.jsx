@@ -9,7 +9,6 @@ import {
 } from '../utils/utils';
 import SubmissionModal from './SubmissionModal';
 import Button from 'react-bootstrap/Button';
-import { connect } from 'react-redux';
 import * as style from './style.css';
 
 class App extends React.Component {
@@ -19,7 +18,6 @@ class App extends React.Component {
       data: [],
       idToBeDeleted: null,
       showSubmissionModal: false,
-      isDeleting: false,
       diaryCount: 0,
       showAlert: false,
       isIncomplete: false,
