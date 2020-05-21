@@ -9,6 +9,7 @@ import {
 } from '../utils/utils';
 import SubmissionModal from './SubmissionModal';
 import Button from 'react-bootstrap/Button';
+import { connect } from 'react-redux';
 import * as style from './style.css';
 
 class App extends React.Component {
@@ -36,11 +37,6 @@ class App extends React.Component {
     try {
       const response = await fetch(`http://localhost:${process.env.PORT || 4000}/diaries`);
       const data = await response.json();
-      let count = 0;
-      data.forEach(item => {
-        count++
-        item.showFormModal = false
-      });
       this.setState({
         data,
         diaryCount: count
@@ -151,6 +147,7 @@ class App extends React.Component {
 
   render() {
     const { data, showSubmissionModal, isIncomplete, newDiary, diaryCount } = this.state;
+
     return (
       <div className="container-sm">
         <div className={style.heading}>My Diary Book</div>{`Total diaries: ${diaryCount}`}
@@ -187,4 +184,16 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  data: state.data,
+  idToBeDeleted: state.idToBeDeleted,
+  showSubmissionModal: state.showSubmissionModal,
+  diaryCount: state.diaryCount,
+  showAlert: state.showAlert,
+  isIncomplete: state.isIncomplete,
+  newDiary: state.newDiary,
+  loading: state.loading,
+  error: state.error
+})
+
+export default connect(mapStateToProps)(App);
