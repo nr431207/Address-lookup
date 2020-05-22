@@ -58,4 +58,4 @@ app.delete('/diaries/:id', (req, res) => {
  });
 });
 
-app.listen(port, () => console.log(`Example app listening at ${port}`));
+app.listen(port, () => console.log(`app listening at ${port}`));

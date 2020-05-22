@@ -28,10 +28,11 @@ export const isContentLong = body => {
 export const getModalBodyMessage = (isIncomplete, isTitleLong, isContentLong, body) => {
   if(body.length) {
     body = JSON.parse(body);
+    console.log(body)
   } else {
     return 'Are you sure you want to delete this content?';
   } 
- if (isIncomplete) {
+ if(isIncomplete) {
    if(!isTitleLong(body) && !isContentLong(body)) {
      return 'Content field is empty!';
    } else if(isTitleLong(body) && !isContentLong(body)) {

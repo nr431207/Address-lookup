@@ -1,0 +1,8 @@
+export const TOGGLE_DELETE_MODAL = "TOGGLE_DELETE_MODAL";
+export const FETCH_DATA_PENDING = "FETCH_DATA_PENDING";
+export const FETCH_DATA_SUCCESS = "FETCH_DATA_SUCCESS";
+export const FETCH_DATA_ERROR = "FETCH_DATA_ERROR";
+export const ADD_ITEM = "ADD_ITEM";
+export const EDIT_ITEM = "EDIT_ITEM";
+export const DELETE_ITEM = "DELETE_ITEM";
+export const SUBMIT_CHANGE = "SUBMIT_CHANGE";

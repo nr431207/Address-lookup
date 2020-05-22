@@ -6,6 +6,7 @@ import './style.css';
 import * as style from './style.css';
 
 const SubmissionModal = ({ handleDelete, id, isIncomplete, toggleModal, newDiary }) => {
+  console.log(newDiary)
   const [show, setShow] = useState(true);
   const handleClose = () => setShow(false);
 
