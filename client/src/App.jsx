@@ -9,18 +9,102 @@ import {
 } from '../utils/utils';
 import SubmissionModal from './SubmissionModal';
 import Button from 'react-bootstrap/Button';
-import { connect } from 'react-redux';
-import * as actions from './actions/actionCreators';
 import * as style from './style.css';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
+    this.state = {
+      data: [],
+      idToBeDeleted: null,
+      showSubmissionModal: false,
+      diaryCount: 0,
+      showAlert: false,
+      isIncomplete: false,
+      newDiary: {}
+    }
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onAddClick = this.onAddClick.bind(this);
+    this.fetchData = this.fetchData.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+  }
+
+  async fetchData() {
+    try {
+      const response = await fetch(`http://localhost:${process.env.PORT || 4000}/diaries`);
+      const data = await response.json();
+      let count = 0;
+      data.forEach(item => {
+        count++
+        item.showFormModal = false
+      });
+      this.setState({
+        data,
+        diaryCount: count
+      })
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   componentDidMount() {
-    this.props.fetchData();
+    this.fetchData();
+  }
+
+  onShowAlert() {
+    this.setState({ showAlert: !this.state.showAlert });
+  }
+
+  onAddClick() {
+    const data = this.state.data;
+    data.unshift({
+      showFormModal: true,
+      title: '',
+      content: '',
+      creationDate: ''
+    })
+    this.setState({ data });
+  }
+
+  handleCancel() {
+    this.fetchData();
+  }
+
+  handleEdit(itemId) {
+    const data = this.state.data.map(item => {
+      if (item.id === itemId) {
+        item.showFormModal = true;
+      }
+      return item;
+    })
+    this.setState({ data })
+  }
+
+  handleDelete(id) {
+    let itemId = id.currentTarget.getAttribute('value');
+    fetch(`http://localhost:${process.env.PORT || 4000}/diaries/${itemId}`, {
+      method: 'delete',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+      .then(response => response);
+    this.fetchData();
+    this.toggleModal();
+  }
+
+  toggleModal() {
+    this.setState({ showSubmissionModal: !this.state.showSubmissionModal });
+  }
+
+  toggleDeleteModal(id) {
+    this.setState({
+      showSubmissionModal: !this.state.showSubmissionModal,
+      idToBeDeleted: id.currentTarget.getAttribute('value')
+    })
   }
 
   handleSubmit(e) {
@@ -66,59 +150,41 @@ class App extends React.Component {
   }
 
   render() {
+    const { data, showSubmissionModal, isIncomplete, newDiary, diaryCount } = this.state;
     return (
       <div className="container-sm">
-        <div className={style.heading}>My Diary Book</div>{`Total diaries: ${this.props.diaryCount}`}
-        <div><Button variant="primary" onClick={this.props.addNewItem}>Add a new diary</Button></div>
-        {this.props.data.map((diary, index) => {
+        <div className={style.heading}>My Diary Book</div>{`Total diaries: ${diaryCount}`}
+        <div><Button variant="primary" onClick={this.onAddClick}>Add a new diary</Button></div>
+        {data.map((diary, index) => {
           return (
             <div key={index}>
               {diary.showFormModal ?
                 <Form
                   handleSubmit={this.handleSubmit}
-                  handleCancel={this.props.fetchData}
+                  handleCancel={this.handleCancel}
                   diary={diary}
                 />
                 :
                 <Diary
                   diary={diary}
-                  showSubmissionModal={this.props.showSubmissionModal}
-                  handleEdit={this.props.handleEdit(diary.id)}
-                  toggleDeleteModal={this.props.toggleDeleteModal(id.currentTarget.getAttribute('value'))}
+                  showSubmissionModal={showSubmissionModal}
+                  handleEdit={this.handleEdit.bind(this, diary.id)}
+                  toggleDeleteModal={this.toggleDeleteModal}
                 />}
             </div>
           )
         })}
-        {this.props.showSubmissionModal &&
+        {showSubmissionModal &&
           <SubmissionModal
-            toggleModal={this.props.toggleModal}
-            handleDelete={this.props.handleDelete(id.currentTarget.getAttribute('value'))}
-            id={this.props.idToBeDeleted}
-            isIncomplete={this.props.isIncomplete}
-            newDiary={this.props.newDiary}
+            toggleModal={this.toggleModal}
+            handleDelete={this.handleDelete}
+            id={this.state.idToBeDeleted}
+            isIncomplete={isIncomplete}
+            newDiary={newDiary}
           />}
       </div>
     )
   }
 }
 
-const mapStateToProps = state => ({
-  data: state.data,
-  idToBeDeleted: state.idToBeDeleted,
-  showSubmissionModal: state.showSubmissionModal,
-  diaryCount: state.diaryCount,
-  isIncomplete: state.isIncomplete,
-  newDiary: state.newDiary,
-  loading: state.loading,
-  error: state.error
-});
-
-const mapDispatchToProps = dispatch => ({
-  toggleDeleteModal: () => dispatch(actions.toggleDeleteModal()),
-  fetchData: () => dispatch(actions.fetchData()),
-  addNewItem: () => dispatch(actions.addNewItem()),
-  handleEdit: (id) => dispatch(actions.handleEdit(id)),
-  deleteItem: (id) => dispatch(actions.deleteItem(id))
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
