@@ -1,4 +1,4 @@
-# Address-lookup
+# Diary-App
 This is a full stack CRUD web application for saving personal diaries/logs. Users can perform the following using this application: 
 -   Add a new content     
 -   Delete a current content
