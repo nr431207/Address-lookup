@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/nr431207/Diary-App#readme",
   "dependencies": {
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^5.0.0",
     "caniuse-lite": "^1.0.30001677",
     "classnames": "^2.2.6",
     "cors": "^2.8.5",
